@@ -1,0 +1,25 @@
+---
+
+- name: Install Apache
+  hosts: apacheserver
+  become: true
+  remote_user: root
+  
+  tasks:
+  
+  # Configuration BIND for DND and Config DNS Server
+  - name: Install Bind
+    yum: name={{ item }} state=installed
+    with_items:
+      - bind
+      - bind-utils
+
+  - name: Copy named.conf file
+    template: src=named.conf.j2 dest=/etc/named.conf
+
+  - name: Copy Zone file
+    template: src=testdns.zone.j2 dest=/var/named/testdns.zone
+
+  - name: Start and enable BIND
+    systemd: name=named state=started enabled=yes
+

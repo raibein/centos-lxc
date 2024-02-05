@@ -1,0 +1,85 @@
+---
+
+- name: Install Apache
+  hosts: apacheserver
+  # become: true
+  remote_user: root
+  
+  tasks:
+  
+  # Installing Apache Server
+  - name: Install Apache
+    yum:
+      name: httpd
+      state: present
+  
+  - name: Start Apache
+    service:
+      name: httpd
+      state: started
+      enabled: yes
+
+
+  # Installing Docker
+  - name: "Installing Docker Prerequisite packages"
+    yum:
+      name: "{{ item }}"
+      state: latest
+    with_items:
+    - yum-utils
+    - device-mapper-persistent-data
+    - lvm2
+
+  - name: "Configuring docker-ce repo"
+    get_url:
+      url: https://download.docker.com/linux/centos/docker-ce.repo
+      dest: /etc/yum.repos.d/docker-ce.repo
+      mode: 0644
+  
+  - name: " Installing Docker latest version"
+    yum:
+      name: docker-ce
+      state: present
+    
+  - name: " Starting and Enabling Docker service"
+    service:
+      name: docker
+      state: started
+      enabled: yes
+
+
+  # Configuration DNS
+  - name: make sure line 'dns=none' is set in /etc/NetworkManager/NetworkManager.conf
+    ini_file:
+      path: /etc/NetworkManager/NetworkManager.conf
+      state: present
+      no_extra_spaces: yes
+      section: main
+      option: dns
+      value: none
+      owner: root
+      group: root
+      mode: 0644
+      backup: yes
+    notify:
+      - reload NetworkManager
+
+  - name: deploy resolv.conf template
+    template:
+      src: templates/resolv.conf.j2
+      dest: /etc/resolv.conf
+      owner: root
+      group: root
+      mode: 0644
+      backup: yes
+    notify:
+      - reload NetworkManager
+
+  
+  # Handler Start Here
+  handlers:
+    - name: reload NetworkManager
+      service:
+        name: NetworkManager
+        state: reloaded
+

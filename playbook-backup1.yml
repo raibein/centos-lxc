@@ -1,0 +1,72 @@
+---
+
+- name: Install Apache
+  hosts: apacheserver
+  # become: true
+  # remote_user: root
+  
+  tasks:
+  
+  # Installing Apache Server
+  - name: Install Apache
+    yum:
+      name: httpd
+      state: present
+  
+  - name: Start Apache
+    service:
+      name: httpd
+      state: started
+      enabled: yes
+
+
+  # Installing Docker
+  - name: "Installing Docker Prerequisite packages"
+    yum:
+      name: "{{ item }}"
+      state: latest
+    with_items:
+    - yum-utils
+    - device-mapper-persistent-data
+    - lvm2
+
+  - name: "Configuring docker-ce repo"
+    get_url:
+      url: https://download.docker.com/linux/centos/docker-ce.repo
+      dest: /etc/yum.repos.d/docker-ce.repo
+      mode: 0644
+  
+  - name: " Installing Docker latest version"
+    yum:
+      name: docker-ce
+      state: present
+    
+  - name: " Starting and Enabling Docker service"
+    service:
+      name: docker
+      state: started
+      enabled: yes
+
+
+  # Configuration DNS
+  - name: Set static DNS servers
+    appliance_networking_dns_servers:
+      servers:
+      - 1.1.1.1
+      mode: is_static
+      state: set
+    register: result
+
+  - name: Add another DNS server
+    appliance_networking_dns_servers:
+      server: 8.8.4.4
+      state: add
+    register: result
+
+  - name: Test the DNS servers
+    appliance_networking_dns_servers:
+      state: test
+      servers:
+      - google.com
+    register: result
+

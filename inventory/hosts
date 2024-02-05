@@ -1,0 +1,13 @@
+[apacheserver]
+# 192.168.140.238 ansible_password="$3Rv3R0n3Hom3" ansible_ssh_user="root"
+# 192.168.122.227 ansible_password="@143$up3R" ansible_ssh_user="root"
+192.168.122.227 ansible_ssh_user="root"
+# localhost ansible_password="$3Rv3R0n3Hom3"
+# localhost ansible_password="$3Rv3R0n3Hom3"
+# 10.94.211.1
+
+
+
+
+# [myservers]
+# foo.com ansible_ssh_host="localhost" ansible_password="$3Rv3R0n3Hom3" ansible_ssh_user="root"

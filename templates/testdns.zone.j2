@@ -1,0 +1,14 @@
+$TTL 86400
+@   IN SOA testdns. testdns.local. (
+    2018020801  ;Serial
+    3600        ;Refresh
+    1800        ;Retry
+    3600000     ;Expire
+    86400       ;Minimum TTL
+)
+
+@       IN  NS  master.testdns.
+@       IN  A   192.168.140.238
+@       IN  A   192.168.122.227
+master  IN  A   192.168.140.238
+web     IN  A   192.168.122.227
